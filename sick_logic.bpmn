@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="Process_1" isExecutable="true">
+
+    <bpmn:scriptTask id="CheckAge" name="Check if age > 21">
+      <bpmn:script>age > 21</bpmn:script>
+    </bpmn:scriptTask>
+
+    <bpmn:scriptTask id="InferSickness" name="Determine sickness">
+      <bpmn:script>
+if age > 21:
+    is_sick = has_fever
+else:
+    is_sick = False
+      </bpmn:script>
+    </bpmn:scriptTask>
+
+    <bpmn:scriptTask id="FinalCheck" name="Is sick check">
+      <bpmn:script>is_sick == True</bpmn:script>
+    </bpmn:scriptTask>
+
+  </bpmn:process>
+</bpmn:definitions>
