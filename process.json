@@ -1,0 +1,6 @@
+{
+  "Process_1": "validate_email.bpmn",
+  "AssignRoleProcess": "assign_role_by_age.bpmn",
+  "CheckAMPM": "time.bpmn",
+  "UserValidationProcess": "UserValidationProcess.bpmn"
+}

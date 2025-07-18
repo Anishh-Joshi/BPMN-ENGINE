@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_1"
+                  targetNamespace="http://example.com/bpmn">
+
+  <bpmn:process id="AssignRoleProcess" isExecutable="true">
+
+    <bpmn:startEvent id="StartEvent_1" name="Start"/>
+    <bpmn:sequenceFlow id="flow1" sourceRef="StartEvent_1" targetRef="ScriptTask_1"/>
+
+    <bpmn:scriptTask id="ScriptTask_1" name="Assign Role by Age">
+      <bpmn:script><![CDATA[
+role = "admin" if age > 21 else "user"
+      ]]></bpmn:script>
+    </bpmn:scriptTask>
+
+    <bpmn:sequenceFlow id="flow2" sourceRef="ScriptTask_1" targetRef="EndEvent_1"/>
+    <bpmn:endEvent id="EndEvent_1" name="End"/>
+
+  </bpmn:process>
+</bpmn:definitions>

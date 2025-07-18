@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+             targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <process id="UserValidationProcess" name="User Validation Process">
+    
+    <startEvent id="StartEvent" name="Start Validation"/>
+    
+    <!-- Check name length -->
+    <scriptTask id="ScriptTask_NameCheck" name="Validate Name Length">
+      <script><![CDATA[
+is_name_valid = len(name) > 5
+      ]]></script>
+    </scriptTask>
+    
+    <!-- Check age -->
+    <scriptTask id="ScriptTask_AgeCheck" name="Validate Age">
+      <script><![CDATA[
+is_age_valid = age > 21
+      ]]></script>
+    </scriptTask>
+    
+    <!-- Check password length -->
+    <scriptTask id="ScriptTask_PasswordCheck" name="Validate Password">
+      <script><![CDATA[
+is_password_valid = len(password) >= 6
+      ]]></script>
+    </scriptTask>
+    
+    <!-- Check role -->
+    <scriptTask id="ScriptTask_RoleCheck" name="Validate Role">
+      <script><![CDATA[
+is_role_valid = role.lower() == 'user'
+      ]]></script>
+    </scriptTask>
+    
+    <!-- Final validation -->
+    <scriptTask id="ScriptTask_FinalValidation" name="Final Validation">
+      <script><![CDATA[
+is_valid_user = is_name_valid and is_age_valid and is_password_valid and is_role_valid
+      ]]></script>
+    </scriptTask>
+    
+    <endEvent id="EndEvent" name="Validation Complete"/>
+    
+    <!-- Sequence flows -->
+    <sequenceFlow id="Flow_Start" sourceRef="StartEvent" targetRef="ScriptTask_NameCheck"/>
+    <sequenceFlow id="Flow_NameToAge" sourceRef="ScriptTask_NameCheck" targetRef="ScriptTask_AgeCheck"/>
+    <sequenceFlow id="Flow_AgeToPassword" sourceRef="ScriptTask_AgeCheck" targetRef="ScriptTask_PasswordCheck"/>
+    <sequenceFlow id="Flow_PasswordToRole" sourceRef="ScriptTask_PasswordCheck" targetRef="ScriptTask_RoleCheck"/>
+    <sequenceFlow id="Flow_RoleToFinal" sourceRef="ScriptTask_RoleCheck" targetRef="ScriptTask_FinalValidation"/>
+    <sequenceFlow id="Flow_FinalToEnd" sourceRef="ScriptTask_FinalValidation" targetRef="EndEvent"/>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_UserValidation">
+    <bpmndi:BPMNPlane id="BPMNPlane_UserValidation" bpmnElement="UserValidationProcess">
+      <!-- Diagram elements would be here in a full BPMN file -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

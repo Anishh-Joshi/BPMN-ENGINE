@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ assignee }}'s Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-3xl font-bold mb-6">{{ assignee | capitalize }}'s Pending Requests</h1>
+    <div id="requests-container" class="space-y-4">
+      <!-- Requests will be loaded here by JS -->
+    </div>
+  </div>
+
+<script>
+async function fetchRequests() {
+  const res = await fetch('/pending-requests');
+  const allRequests = await res.json();
+
+  // Filter requests for this assignee
+  const assignee = "{{ assignee }}";
+  const requests = allRequests.filter(r => r.assignee === assignee);
+
+  const container = document.getElementById('requests-container');
+  container.innerHTML = '';
+
+  if (requests.length === 0) {
+    container.innerHTML = '<p class="text-gray-500">No pending requests.</p>';
+    return;
+  }
+
+  requests.forEach((req, i) => {
+    const div = document.createElement('div');
+    div.className = 'border p-4 rounded shadow';
+
+    div.innerHTML = `
+      <p><strong>Process ID:</strong> ${req.process_id}</p>
+      <p><strong>Variables:</strong> <pre class="bg-gray-100 p-2 rounded">${JSON.stringify(req.variables, null, 2)}</pre></p>
+      <button class="bg-green-500 text-white px-4 py-2 rounded mr-2" onclick="handleDecision(${i}, true)">Accept</button>
+      <button class="bg-red-500 text-white px-4 py-2 rounded" onclick="handleDecision(${i}, false)">Reject</button>
+      <div id="result-${i}" class="mt-3"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function handleDecision(index, accept) {
+  const resultDiv = document.getElementById(`result-${index}`);
+  resultDiv.innerHTML = 'Processing...';
+
+  if (accept) {
+    // Get the request details from /pending-requests to evaluate
+    const res = await fetch('/pending-requests');
+    const allRequests = await res.json();
+    const req = allRequests.filter(r => r.assignee === "{{ assignee }}")[index];
+
+    if (!req) {
+      resultDiv.innerHTML = 'Request not found.';
+      return;
+    }
+
+    // Prepare form data for evaluate endpoint
+    const formData = new FormData();
+    formData.append('process_id', req.process_id);
+    for (const [k, v] of Object.entries(req.variables)) {
+      formData.append(k, v);
+    }
+
+    // Call /evaluate with request data
+    const evalRes = await fetch('/evaluate', {
+      method: 'POST',
+      body: formData
+    });
+    const evalJson = await evalRes.json();
+
+    // Show evaluation results
+    resultDiv.innerHTML = `<pre class="bg-gray-100 p-2 rounded">${JSON.stringify(evalJson, null, 2)}</pre>`;
+
+    // Remove from pending
+    await fetch(`/mark-request-processed/${index}`, { method: 'POST' });
+  } else {
+    // Reject request
+    await fetch(`/reject-request/${index}`, { method: 'POST' });
+    resultDiv.innerHTML = 'Request rejected and removed.';
+  }
+
+  // Refresh the list after a short delay
+  setTimeout(fetchRequests, 5 * 60 * 1000);
+}
+
+fetchRequests();
+</script>
+</body>
+</html>
