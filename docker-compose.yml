@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  bpmn-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ASSIGNEES: ${ASSIGNEES}
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./bpmn:/app/bpmn
+      - ./templates:/app/templates
+      - ./assignee:/app/assignee
+      - ./pending:/app/pending
+      - ./process:/app/process
+      - ./generated:/app/generated
+    env_file:
+      - .env

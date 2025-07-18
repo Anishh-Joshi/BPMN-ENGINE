@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# Pytest cache
+.pytest_cache/
+
+# Docker
+docker-compose.override.yml
+*.log
+
+# Docker volumes and runtime files (optional)
+*.pid
+*.sock
+
+# Local JSON data files that are generated at runtime or build
+assignee
+pending
+process
+constants
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor config
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Env files (if you keep sensitive data)
+.env
