@@ -23,7 +23,7 @@ RUN mkdir -p assignee && \
     json.dump(assignees, open('assignee/assignee_available.json', 'w'))"
 
 # Create required folders
-RUN mkdir -p bpmn pending process generated templates
+RUN mkdir -p bpmn pending process templates
 
 # Expose port
 EXPOSE 5000
