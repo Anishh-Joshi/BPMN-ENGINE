@@ -29,8 +29,18 @@ assignees = load_assignees()
 
 @app.route('/')
 def index():
-    # Pass process IDs and assignees to template
-    return render_template('index.html', process_ids=process_map.keys(), assignees=assignees)
+    process_id = request.args.get('process_id', None) 
+    
+    if process_id == 'UserValidationProcess':
+        return render_template('process_form.html', 
+                            process_id=process_id, 
+                            assignees=assignees)
+    elif process_id == 'CheckAMPM':
+        return render_template('time.html', 
+                            process_id=process_id, 
+                            assignees=assignees)
+    else:
+        return "Invalid process ID", 400
 
 @app.route('/portal/<assignee>')
 def assignee_portal(assignee):
