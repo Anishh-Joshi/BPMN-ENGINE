@@ -12,9 +12,8 @@ services:
     volumes:
       - ./bpmn:/app/bpmn
       - ./templates:/app/templates
-      - ./assignee:/app/assignee
+      - ./assignee:/assignee            # Mount host ./assignee to container /assignee for syncing JSON
       - ./pending:/app/pending
-      - ./process:/app/process
-      - ./generated:/app/generated
+      - ./process:/process
     env_file:
       - .env

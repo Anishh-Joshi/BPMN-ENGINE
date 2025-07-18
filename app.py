@@ -158,12 +158,18 @@ def evaluate():
     return jsonify(response)
 
 
+
+    
 if __name__ == '__main__':
     os.makedirs('process', exist_ok=True)
     os.makedirs('pending', exist_ok=True)
     os.makedirs('assignee', exist_ok=True)
-    if not os.path.exists('bpmn'):
-        os.makedirs('bpmn')
+    os.makedirs('bpmn', exist_ok=True)
+
+
+    # Generate process mapping JSON file
     generate_process_mapping()
     print(f"✅ Process mapping generated: process.json")
-    app.run(debug=True)
+
+    # Run Flask
+    app.run(host='0.0.0.0', port=5000, debug=True)

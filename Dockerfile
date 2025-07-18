@@ -1,32 +1,22 @@
-# Use official Python image
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Copy app code
 COPY . .
 
-# Build-time env var to get assignees
-ARG ASSIGNEES
-ENV ASSIGNEES=${ASSIGNEES}
+# Create necessary directories (optional here, also in entrypoint)
+RUN mkdir -p bpmn pending process templates assignee
 
-# Create assignee JSON and folders during build
-RUN mkdir -p assignee && \
-    python3 -c "import os, json; \
-    assignees = os.getenv('ASSIGNEES', '').split(','); \
-    os.makedirs('assignee', exist_ok=True); \
-    json.dump(assignees, open('assignee/assignee_available.json', 'w'))"
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Create required folders
-RUN mkdir -p bpmn pending process templates
-
-# Expose port
 EXPOSE 5000
 
-# Run the app with Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Run entrypoint script on container start
+ENTRYPOINT ["/entrypoint.sh"]

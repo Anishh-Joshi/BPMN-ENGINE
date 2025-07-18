@@ -62,7 +62,7 @@ docker-compose up
 ```
 
 Then visit:
-📍 [http://127.0.0.1:5050](http://localhost:5050)
+📍 [http://127.0.0.1:5050](http://127.0.0.1:5050)
 
 ---
 
@@ -71,7 +71,7 @@ Then visit:
 You can directly call the evaluation API to run BPMN logic without any UI forms or review:
 
 ```bash
-curl -X POST http://localhost:5050/evaluate \
+curl -X POST http://127.0.0.1:5050/evaluate \
   -F "process_id=CheckAMPM" \
   -F "time=15:20"
 ```
@@ -149,7 +149,7 @@ You can now invoke your custom BPMN process via:
 * **Direct API call:**
 
 ```bash
-curl -X POST http://localhost:5050/evaluate \
+curl -X POST http://127.0.0.1:5050/evaluate \
   -F "process_id=YourCustomProcessID" \
   -F "your_variable1=value1" \
   -F "your_variable2=value2"
@@ -158,13 +158,13 @@ curl -X POST http://localhost:5050/evaluate \
 * **Form UI (if you create a corresponding form template):**
 
 ```
-http://localhost:5050/?process_id=YourCustomProcessID
+http://127.0.0.1:5050/?process_id=YourCustomProcessID
 ```
 
 * **Review portal:**
 
 ```
-http://localhost:5050/portal/<assignee_name>
+http://127.0.0.1:5050/portal/<assignee_name>
 ```
 
 ---
