@@ -99,9 +99,6 @@ To leverage the full review feature with submission forms and assignee review po
 The portal internally uses the `/evaluate` API for processing but provides a user-friendly interface for review, accept/reject, and management.
 
 ---
-Absolutely! Here’s a clear section you can add to your README explaining how users can add their own BPMN 2.0 files, link them, and use them in your app:
-
----
 
 ## ➕ Adding Your Own BPMN 2.0 Files
 
@@ -185,8 +182,6 @@ If your process requires user input forms:
 This makes your BPMN workflows fully extensible and integrated into the review and evaluation system.
 
 ---
-
-Would you like me to help you create a sample BPMN file and matching form template as a starting point?
 
 
 ## 🛠️ Development Tips
