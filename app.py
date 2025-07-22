@@ -6,6 +6,7 @@ from utils.file_utils import (
 )
 import os
 import re
+from utils.process_handlers import PROCESS_HANDLERS
 
 app = Flask(__name__)
 
@@ -27,12 +28,34 @@ assignees = load_assignees()
 @app.route('/')
 def index():
     process_id = request.args.get('process_id')
-    if process_id == 'UserValidationProcess':
-        return render_template('process_form.html', process_id=process_id, assignees=assignees)
-    elif process_id == 'CheckAMPM':
-        return render_template('time.html', process_id=process_id, assignees=assignees)
-    else:
+    if not process_id or process_id not in process_map:
         return "Invalid process ID", 400
+
+    bpmn_file = process_map[process_id]
+    bpmn_path = os.path.join('bpmn', bpmn_file)
+
+    from utils.bpmn_utils import requires_approval
+    approval_required = requires_approval(bpmn_path)
+
+    ctx = {
+        'process_id': process_id,
+        'assignees': assignees,
+        'approval_required': approval_required,
+    }
+
+    # Map each process to its template
+    template_map = {
+        'UserValidationProcess': 'process_form.html',
+        'CheckAMPM':             'time.html',
+        'UserRegistrationApproval': 'registration_form.html',
+        'UserRegistrationAuto':               'registration_form.html',  # ← here
+    }
+
+    tpl = template_map.get(process_id)
+    if not tpl:
+        return "Invalid process ID", 400
+
+    return render_template(tpl, **ctx)
 
 
 @app.route('/portal/<string:assignee>')
@@ -49,21 +72,47 @@ def serve_assignees():
 def submit_request():
     data = request.form.to_dict()
     process_id = data.get('process_id')
-    assignee = data.get('assignee')
+    assignee = data.get('assignee')  # may be None
     variables = {k: v for k, v in data.items() if k not in ('process_id', 'assignee')}
 
-    if not process_id or not assignee:
-        return jsonify({'error': 'process_id and assignee are required'}), 400
+    if not process_id:
+        return jsonify({'error': 'process_id is required'}), 400
 
-    pending = load_pending_requests()
-    pending.append({
-        'process_id': process_id,
-        'assignee': assignee,
-        'variables': variables,
-    })
-    save_pending_requests(pending)
+    bpmn_file = process_map.get(process_id)
+    if not bpmn_file:
+        return jsonify({'error': 'Invalid process_id'}), 404
 
-    return jsonify({'message': 'Request submitted', 'total_pending': len(pending)}), 201
+    bpmn_path = os.path.join("bpmn", bpmn_file)
+
+    from utils.bpmn_utils import requires_approval
+    approval_required = requires_approval(bpmn_path)
+
+    if approval_required:
+        if not assignee:
+            return jsonify({'error': 'Assignee required for approval flows'}), 400
+        pending = load_pending_requests()
+        pending.append({
+            'process_id': process_id,
+            'assignee': assignee,
+            'variables': variables,
+        })
+        save_pending_requests(pending)
+        return jsonify({'message': 'Pending approval', 'total_pending': len(pending)}), 201
+
+    # 🔁 Otherwise, approval not required → Auto evaluate and handle
+    from werkzeug.datastructures import MultiDict
+    form_data = MultiDict(data)
+    form_data.setlist("process_id", [process_id])  # ensure it's in list format
+
+    with app.test_request_context('/evaluate', method='POST', data=form_data):
+        eval_response = evaluate()
+        response_data = eval_response.get_json()
+
+    return jsonify({
+        'message': 'Auto-evaluated and processed',
+        'result': response_data
+    }), 200
+
 
 
 @app.route('/pending-requests')
@@ -97,7 +146,7 @@ def reject_request(index):
 @app.route('/evaluate', methods=['POST'])
 def evaluate():
     data = request.form
-    process_id = data.get('process_id')
+    process_id = data.getlist('process_id')[0] if 'process_id' in data else None
     if not process_id:
         return jsonify({'error': 'Missing process_id'}), 400
 
@@ -154,7 +203,25 @@ def evaluate():
     }
     if validations:
         response["validations"] = validations
+    
+    import traceback
+    try:
+        print(process_id)
+        handler = PROCESS_HANDLERS.get(process_id)
+        print(handler)
+        if handler:
+            try:
+                response["post_process"] = handler(variables)
+            except Exception as e:
+                print(f"[Handler Error] {process_id}: {str(e)}")
+                print(traceback.format_exc())
+                response["post_process"] = {"error": f"Handler failed: {str(e)}"}
+    except Exception as outer_e:
+        print(f"[Evaluate Error] {process_id}: {str(outer_e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': 'Internal evaluation failure'}), 500
 
+    # ✅ Always return a response
     return jsonify(response)
 
 
@@ -172,4 +239,4 @@ if __name__ == '__main__':
     print(f"✅ Process mapping generated: process.json")
 
     # Run Flask
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

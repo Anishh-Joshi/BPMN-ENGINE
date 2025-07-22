@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <process id="WeatherDecision" isExecutable="true">
+
+    <!-- Evaluate Weather -->
+    <scriptTask id="WeatherCheck" name="Weather Logic">
+      <script><![CDATA[
+is_raining = is_windy  # Simple logic: if windy, it's going to rain
+      ]]></script>
+    </scriptTask>
+
+  </process>
+</definitions>

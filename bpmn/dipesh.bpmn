@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" name="test-process" targetNamespace="http://activiti.org/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <process id="test-process" name="test-process" isExecutable="true">
+    <startEvent id="startEvent" name="Start Process" />
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1" />
+    <userTask id="task1" name="First Task" activiti:candidateGroups="testgroup">
+      <documentation>This is the first user task in the process</documentation>
+      <extensionElements>
+        <activiti:formProperty id="name" name="Name" type="string" required="true" />
+        <activiti:formProperty id="approved" name="Approved" type="boolean" />
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="exclusiveGateway" />
+    <exclusiveGateway id="exclusiveGateway" name="Decision Gateway" />
+    <sequenceFlow id="flow3" sourceRef="exclusiveGateway" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression">${approved}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusiveGateway" targetRef="task3">
+      <conditionExpression xsi:type="tFormalExpression">${!approved}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="task2" name="Approval Task" activiti:candidateGroups="testgroup">
+      <documentation>Task for approved requests</documentation>
+    </userTask>
+    <userTask id="task3" name="Rejection Task" activiti:candidateGroups="testgroup">
+      <documentation>Task for rejected requests</documentation>
+    </userTask>
+    <sequenceFlow id="flow5" sourceRef="task2" targetRef="endEvent" />
+    <sequenceFlow id="flow6" sourceRef="task3" targetRef="endEvent" />
+    <endEvent id="endEvent" name="Process Completed" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test-process">
+    <bpmndi:BPMNPlane id="BPMNPlane_test-process" bpmnElement="test-process">
+      <bpmndi:BPMNShape id="BPMNShape_startEvent" bpmnElement="startEvent">
+        <omgdc:Bounds x="100" y="163" width="30" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task1" bpmnElement="task1">
+        <omgdc:Bounds x="200" y="138" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_exclusiveGateway" bpmnElement="exclusiveGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="370" y="158" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task2" bpmnElement="task2">
+        <omgdc:Bounds x="480" y="58" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_task3" bpmnElement="task3">
+        <omgdc:Bounds x="480" y="218" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endEvent" bpmnElement="endEvent">
+        <omgdc:Bounds x="650" y="163" width="28" height="28" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="130" y="178" />
+        <omgdi:waypoint x="200" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="300" y="178" />
+        <omgdi:waypoint x="370" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="390" y="158" />
+        <omgdi:waypoint x="390" y="98" />
+        <omgdi:waypoint x="480" y="98" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="390" y="198" />
+        <omgdi:waypoint x="390" y="258" />
+        <omgdi:waypoint x="480" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="580" y="98" />
+        <omgdi:waypoint x="650" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="580" y="258" />
+        <omgdi:waypoint x="650" y="177" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

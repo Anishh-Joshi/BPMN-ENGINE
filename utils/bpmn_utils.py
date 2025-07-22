@@ -62,3 +62,15 @@ def try_parse_value(value):
     except ValueError:
         pass
     return value
+
+
+def requires_approval(xml_path):
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    user_tasks = root.findall('.//bpmn:userTask', NAMESPACES)
+
+    # If there's at least one user task with a camunda:assignee, return True
+    for task in user_tasks:
+        if 'assignee' in task.attrib or any('assignee' in k for k in task.attrib.keys()):
+            return True
+    return False
